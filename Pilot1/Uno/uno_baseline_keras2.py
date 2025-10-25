@@ -51,26 +51,7 @@ def extension_from_parameters(args):
     if args.warmup_lr:
         ext += ".wu_lr"
     if args.reduce_lr:
-        ext += ".re_lr"
-    if args.residual:
-        ext += ".res"
-    if args.use_landmark_genes:
-        ext += ".L1000"
-    if args.no_gen:
-        ext += ".ng"
-    for i, n in enumerate(args.dense):
-        if n > 0:
-            ext += ".D{}={}".format(i + 1, n)
-    if args.dense_feature_layers != args.dense:
-        for i, n in enumerate(args.dense):
-            if n > 0:
-                ext += ".FD{}={}".format(i + 1, n)
-
-    return ext
-
-
-def evaluate_prediction(y_true, y_pred):
-    mse = mean_squared_error(y_true, y_pred)
+      
     mae = mean_absolute_error(y_true, y_pred)
     r2 = r2_score(y_true, y_pred)
     corr, _ = pearsonr(y_true, y_pred)
@@ -82,21 +63,6 @@ def log_evaluation(metric_outputs, logger, description="Comparing y_true and y_p
     for metric, value in metric_outputs.items():
         logger.info("  {}: {:.8f}".format(metric, value))
 
-
-class LoggingCallback(Callback):
-    def __init__(self, print_fcn=print):
-        Callback.__init__(self)
-        self.print_fcn = print_fcn
-
-    def on_epoch_end(self, epoch, logs={}):
-        msg = "[Epoch: %i] %s" % (
-            epoch,
-            ", ".join("%s: %f" % (k, v) for k, v in sorted(logs.items())),
-        )
-        self.print_fcn(msg)
-
-
-class PermanentDropout(Dropout):
     def __init__(self, rate, **kwargs):
         super(PermanentDropout, self).__init__(rate, **kwargs)
         self.uses_learning_phase = False
